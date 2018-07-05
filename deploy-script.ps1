@@ -1,4 +1,4 @@
-#ps1
+# ps1_sysnative
 
 # what until disk is attached.
 $Timeout = 6000
@@ -6,7 +6,7 @@ $CheckEvery = 10
 ## Start the timer
 $timer = [Diagnostics.Stopwatch]::StartNew()
 ## Keep in the loop while the computer is not pingable
-while ((Get-Disk | where-object Serialnumber -ne "" | measure).count -eq 1)
+while ((Get-Disk | where-object Serialnumber -ne "" | measure).count -eq 0)
 {
     Write-Verbose -Message "Waiting for [$($ComputerName)] to become pingable..."
     ## If the timer has waited greater than or equal to the timeout, throw an exception exiting the loop

@@ -1,13 +1,25 @@
 #ps1
 
 # what until disk is attached.
-
-# wait unil disk with serialnumber is not equal 0
-while ( (Get-Disk | where-object Serialnumber -ne "" | measure).count -eq 0 ) {
-  Write-Host "Waiting 60 seconds to try again"
-  Start-Sleep -s 60
+$Timeout = 6000
+$CheckEvery = 10
+## Start the timer
+$timer = [Diagnostics.Stopwatch]::StartNew()
+## Keep in the loop while the computer is not pingable
+while ((Get-Disk | where-object Serialnumber -ne "" | measure).count -eq 1)
+{
+    Write-Verbose -Message "Waiting for [$($ComputerName)] to become pingable..."
+    ## If the timer has waited greater than or equal to the timeout, throw an exception exiting the loop
+    if ($timer.Elapsed.TotalSeconds -ge $Timeout)
+    {
+       throw "Timeout exceeded. Giving up on ping availability to [$ComputerName]"
+    }
+    ## Stop the loop every $CheckEvery seconds
+    Start-Sleep -Seconds $CheckEvery
 }
-
+ 
+## When finished, stop the timer
+$timer.Stop()
 
 # Find new openstack disk and initalize
 get-disk | Where-Object SerialNumber -ne "" | Initialize-Disk
